@@ -27,7 +27,6 @@ return {
         "netrw",
         "NvimTree",
         "lazy",
-        "mason",
         "neo-tree",
         "aerial",
         "lspsagaoutline",

@@ -18,10 +18,18 @@ return {
         "rustywind",
         -- php
         "pint",
-        -- astro
-        "astro-language-server",
-        -- Solidity
-        "solidity",
+        -- typescript
+        "typescript-language-server",
+        -- prisma ls
+        "prisma-language-server",
+        -- helm ls
+        "helm-ls",
+        -- nginx
+        "nginx-language-server",
+        -- yaml
+        "yamllint",
+        "yamlfmt",
+        "yamlfix",
       },
     },
   },
