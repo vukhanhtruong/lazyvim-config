@@ -172,7 +172,7 @@ if Util.has("gitsigns.nvim") then
 end
 
 -- Blame line
-keymap("n", "<leader>gl", LazyVim.lazygit.blame_line, { desc = "Git Blame Line" })
+-- keymap("n", "<leader>gl", LazyVim.lazygit.blame_line, { desc = "Git Blame Line" })
 
 -- Fix Spell checking
 keymap("n", "z0", "1z=", {
