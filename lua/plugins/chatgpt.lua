@@ -10,7 +10,7 @@ return {
     },
     config = function()
       require("chatgpt").setup({
-        api_key_cmd = "echo -n " .. os.getenv("OPENAI_TOKEN"),
+        api_key_cmd = "echo -n " .. os.getenv("OPENAI_API_KEY"),
       })
     end,
   },
