@@ -23,3 +23,14 @@ if vim.g.neovide then
   vim.g.neovide_cursor_antialiasing = false
   vim.g.neovide_fullscreen = true
 end
+
+-- Always show last line fully
+vim.opt.display:append("lastline")
+
+-- Leave some space below cursor (prevents last line cutoff)
+vim.opt.scrolloff = 3
+
+-- Make sure statusline is always visible
+vim.opt.laststatus = 3
+
+vim.opt.clipboard = "unnamedplus"

@@ -6,8 +6,9 @@ end
 return {
   -- borrow from https://github.com/folke/dot/blob/master/nvim/lua/plugins/coding.lua
   {
-    "echasnovski/mini.ai",
+    "nvim-mini/mini.ai",
     keys = { { "[f", desc = "Prev function" }, { "]f", desc = "Next function" } },
+
     opts = function()
       -- add treesitter jumping
       ---@param capture string
@@ -15,31 +16,42 @@ return {
       ---@param down boolean
       local function jump(capture, start, down)
         local rhs = function()
-          local parser = vim.treesitter.get_parser()
-          if not parser then
-            return vim.notify("No treesitter parser for the current buffer", vim.log.levels.ERROR)
+          local ft = vim.bo.filetype
+          local lang = vim.treesitter.language.get_lang(ft) or ft
+
+          -- safer: pass language explicitly
+          local ok_parser, parser = pcall(vim.treesitter.get_parser, 0, lang)
+          if not ok_parser or not parser then
+            return vim.notify(("No treesitter parser for %s (lang=%s)"):format(ft, lang), vim.log.levels.ERROR)
           end
 
-          local query = vim.treesitter.get_query(vim.bo.filetype, "textobjects")
+          -- IMPORTANT: use query.get for named queries
+          local query = vim.treesitter.query.get(lang, "textobjects")
           if not query then
-            return vim.notify("No textobjects query for the current buffer", vim.log.levels.ERROR)
+            return vim.notify(
+              ("No 'textobjects' query for %s (lang=%s). Did you install nvim-treesitter-textobjects?"):format(ft, lang),
+              vim.log.levels.ERROR
+            )
           end
 
           local cursor = vim.api.nvim_win_get_cursor(0)
+          local locs = {} ---@type {[1]:number, [2]:number}[]
 
-          ---@type {[1]:number, [2]:number}[]
-          local locs = {}
           for _, tree in ipairs(parser:trees()) do
-            for capture_id, node, _ in query:iter_captures(tree:root(), 0) do
-              if query.captures[capture_id] == capture then
-                local range = { node:range() } ---@type number[]
-                local row = (start and range[1] or range[3]) + 1
-                local col = (start and range[2] or range[4]) + 1
-                if down and row > cursor[1] or (not down) and row < cursor[1] then
+            for id, node in query:iter_captures(tree:root(), 0) do
+              if query.captures[id] == capture then
+                local r1, c1, r2, c2 = node:range()
+                local row = (start and r1 or r2) + 1
+                local col = (start and c1 or c2) + 1
+                if (down and row > cursor[1]) or ((not down) and row < cursor[1]) then
                   table.insert(locs, { row, col })
                 end
               end
             end
+          end
+
+          if #locs == 0 then
+            return vim.notify("No matching textobject locations found", vim.log.levels.WARN)
           end
           return pcall(vim.api.nvim_win_set_cursor, 0, down and locs[1] or locs[#locs])
         end
